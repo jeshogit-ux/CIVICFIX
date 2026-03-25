@@ -1,0 +1,196 @@
+.report-page {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.report-header {
+  text-align: center;
+}
+
+.report-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.report-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.progress-bar-container {
+  margin-top: 40px;
+  width: 100%;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.step-circle.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.step-line {
+  height: 4px;
+  width: 100px;
+  background: var(--glass-bg);
+  margin: 0 12px;
+  transition: var(--transition);
+}
+
+.step-line.active {
+  background: var(--accent-cyan);
+}
+
+.step-labels {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.form-container {
+  padding: 40px;
+}
+
+.form-step {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-step h3 {
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  color: #fff;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.select-field {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+.mock-map-container {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+  background: #111;
+  background-image: radial-gradient(#333 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  gap: 12px;
+}
+
+.pin-animation {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.upload-zone {
+  border: 2px dashed rgba(0, 240, 255, 0.3);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-zone:hover {
+  background: rgba(0, 240, 255, 0.05);
+  border-color: var(--accent-cyan);
+}
+
+.upload-hint {
+  font-size: 0.85rem;
+  color: var(--accent-green);
+  margin-top: 8px;
+}
+
+.success-step {
+  text-align: center;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.karma-reward {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  padding: 8px 16px;
+  background: rgba(0, 240, 255, 0.1);
+  border-radius: 20px;
+  margin-top: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--glass-border);
+}

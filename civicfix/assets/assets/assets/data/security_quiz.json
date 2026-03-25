@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sim_01",
+    "type": "Phishing",
+    "question": "You receive an SMS: 'CivicFix Alert: Your account is locked due to illegal parking. Click bit.ly/fix-99 to appeal.' Is this safe?",
+    "options": ["DANGEROUS", "SAFE"],
+    "answer": 0,
+    "explanation": "Official governance apps never use URL shorteners like bit.ly for legal alerts.",
+    "points": 50
+  },
+  {
+    "id": "sim_02",
+    "type": "Pretexting",
+    "question": "A person in a 'City Tech' vest knocks on your door asking for your WiFi password to 'calibrate local street sensors.' Do you provide it?",
+    "options": ["PROVIDE ACCESS", "DENY & REPORT"],
+    "answer": 1,
+    "explanation": "City sensors operate on dedicated mesh networks and never require private citizen WiFi credentials.",
+    "points": 100
+  },
+  {
+    "id": "sim_03",
+    "type": "Baiting",
+    "question": "You find a USB drive labeled 'Government Employee Salaries' in a public park. What is the safest action?",
+    "options": ["PLUG IN TO CHECK", "LEAVE IT / HAND TO POLICE"],
+    "answer": 1,
+    "explanation": "Unknown USB drives are a primary vector for 'Baiting' attacks that install malware instantly.",
+    "points": 150
+  }
+]
