@@ -105,7 +105,7 @@ const ReportIssue = () => {
       });
       const data = await res.json();
       if (res.ok && data.category) {
-        const validCategories = ["infrastructure", "sanitation", "traffic", "utilities"];
+        const validCategories = ["infrastructure", "sanitation", "traffic", "utilities", "environment", "safety", "animals", "health", "landscaping"];
         if (validCategories.includes(data.category)) {
           setFormData(prev => ({ ...prev, category: data.category }));
         } else {
@@ -230,6 +230,11 @@ const ReportIssue = () => {
                 <option value="sanitation">Sanitation & Garbage</option>
                 <option value="traffic">Traffic & Illegal Parking</option>
                 <option value="utilities">Utilities (Streetlights, Water)</option>
+                <option value="environment">Environment (Pollution, Noise)</option>
+                <option value="safety">Public Safety (Vandalism, Abandoned)</option>
+                <option value="animals">Animals & Pests (Stray, Infestation)</option>
+                <option value="health">Public Health (Food Safety, Medical Waste)</option>
+                <option value="landscaping">Parks & Landscaping (Overgrown, Trees)</option>
               </select>
             </div>
             <div className="form-group">

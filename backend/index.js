@@ -155,7 +155,7 @@ app.post('/api/ai/categorize', async (req, res) => {
     const { description } = req.body;
     if (!description) { return res.status(400).json({ error: 'Description is required' }); }
 
-    const promptText = `Analyze this civic issue description and categorize it tightly into exactly one of these four categories: "infrastructure", "sanitation", "traffic", or "utilities". Description: "${description}". Only return the exact category word in lowercase with no punctuation.`;
+    const promptText = `Analyze this civic issue description and categorize it tightly into exactly one of these nine categories: "infrastructure", "sanitation", "traffic", "utilities", "environment", "safety", "animals", "health", or "landscaping". Description: "${description}". Only return the exact category word in lowercase with no punctuation.`;
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await fetch(endpoint, {
