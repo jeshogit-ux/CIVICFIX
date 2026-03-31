@@ -28,9 +28,9 @@ const About = () => {
     },
     {
       id: 3,
-      name: "Paranay Charan C B",
+      name: "PRANAY CHARAN CB",
       role: "UI & Backend integration",
-      bio: "Paranay bridged the gap between the stunning front-end visuals and robust technical implementation. He worked intricately on UI refinement, component isolation, and ensuring the complex hooks seamlessly manage citizen report data. He's passionate about building scalable solutions for urban ecosystems.",
+      bio: "PRANAY CHARAN CB bridged the gap between the stunning front-end visuals and robust technical implementation. He worked intricately on UI refinement, component isolation, and ensuring the complex hooks seamlessly manage citizen report data. He's passionate about building scalable solutions for urban ecosystems.",
       skills: ["Backend Architecture", "Data Flow", "UI Refinement"],
       color: "var(--accent-green)",
       icon: <Blocks size={40} color="var(--accent-green)" />,

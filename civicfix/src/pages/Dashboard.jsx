@@ -1,12 +1,92 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Map, List, Clock, CheckCircle, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Search, Map as MapIcon, List, Clock, CheckCircle, AlertTriangle, ChevronRight } from 'lucide-react';
+import L from 'leaflet';
 import './Dashboard.css';
+
+// Fix leaflet default icon
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const DashboardMap = ({ userLocation, reports }) => {
+  const mapContainerRef = React.useRef(null);
+  const mapInstanceRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (mapInstanceRef.current === null && mapContainerRef.current) {
+      // Initialize map once
+      const map = L.map(mapContainerRef.current).setView(userLocation, 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors' // Removed zoom control config here to keep default UI
+      }).addTo(map);
+      mapInstanceRef.current = map;
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo(userLocation, 13, { animate: true });
+    }
+  }, [userLocation]);
+
+  React.useEffect(() => {
+    if (mapInstanceRef.current) {
+      // Clear old markers securely
+      mapInstanceRef.current.eachLayer(layer => {
+        if (layer instanceof L.Marker) {
+          layer.remove();
+        }
+      });
+
+      // Add new markers
+      reports.forEach(report => {
+        const marker = L.marker([report.lat, report.lng]).addTo(mapInstanceRef.current);
+        const popupContent = `
+          <div style="color: #000; font-family: var(--font-main)">
+            <strong style="font-size: 1.1rem; color: #333">${report.type} Issue</strong>
+            <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px">
+              <span style="background: ${report.status === 'Resolved' ? '#e0fce5' : '#e0f2fe'}; color: ${report.status === 'Resolved' ? '#00e676' : '#0047ff'}; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600">${report.status}</span>
+            </div>
+            <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #555">${report.location}</p>
+            <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #888">ID: ${report.id} &bull; ${report.date}</p>
+          </div>
+        `;
+        marker.bindPopup(popupContent);
+      });
+    }
+  }, [reports]);
+
+  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%)', zIndex: 0 }} />;
+};
 
 const Dashboard = () => {
   const [view, setView] = useState('list');
   const [filter, setFilter] = useState('All');
   const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState([12.8236, 80.0435]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+      }, (err) => {
+        console.warn('Geolocation blocked or failed in dashboard', err);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -22,26 +102,29 @@ const Dashboard = () => {
 
              const displayStatus = issue.status === 'Pending' ? 'Reported' : issue.status;
              
-             // Extract location preview if available
              let locPreview = 'Location securely stored';
              let issueDesc = issue.description || '';
              let locMatch = issueDesc.match(/\(Location: (.*?)\)/);
              if (locMatch) locPreview = locMatch[1];
 
+             const lat = issue.location?.lat || (12.8236 + (Math.random() * 0.02 - 0.01));
+             const lng = issue.location?.lng || (80.0435 + (Math.random() * 0.02 - 0.01));
+
              return {
                id: 'CFX-' + (issue._id ? issue._id.substring(issue._id.length - 6).toUpperCase() : '0000'),
-               type: issue.category || 'General',
+               type: issue.category ? issue.category.charAt(0).toUpperCase() + issue.category.slice(1) : 'General',
                location: locPreview,
                status: displayStatus,
                date: new Date(issue.createdAt).toLocaleDateString(),
-               icon: icon
+               icon: icon,
+               lat,
+               lng
              };
           });
           setReports(mapped);
         }
       } catch (err) {
         console.error('Failed to fetch reports', err);
-        // Fallback to empty if error is caught
       } finally {
         setIsLoading(false);
       }
@@ -67,7 +150,7 @@ const Dashboard = () => {
             <List size={20} /> List View
           </button>
           <button className={`toggle-btn ${view === 'map' ? 'active' : ''}`} onClick={() => setView('map')}>
-            <Map size={20} /> Map View
+            <MapIcon size={20} /> Map View
           </button>
         </div>
       </div>
@@ -105,10 +188,10 @@ const Dashboard = () => {
                 <div className="report-details">
                   <div className="report-header-line">
                     <span className="tracking-id">{report.id}</span>
-                    <span className={`status-badge ${report.status.toLowerCase()}`}>{report.status}</span>
+                    <span className={`status-badge ${report.status.toLowerCase().replace(' ', '-')}`}>{report.status}</span>
                   </div>
                   <h3>{report.type} Issue</h3>
-                  <p>{report.location} • Reported {report.date}</p>
+                  <p>{report.location} &bull; Reported {report.date}</p>
                 </div>
                 <div className="report-action">
                   <ChevronRight size={24} color="var(--text-secondary)" />
@@ -118,16 +201,8 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="glass-panel" style={{ height: '600px', width: '100%', position: 'relative', overflow: 'hidden', padding: 0 }}>
-            <iframe
-              title="City Map"
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              scrolling="no"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=80.035,12.815,80.050,12.835&layer=mapnik&marker=12.8236,80.0435"
-              style={{ filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%)', border: 'none', display: 'block' }}
-            ></iframe>
-            <div style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(0,0,0,0.8)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(0,240,255,0.3)', backdropFilter: 'blur(10px)', color: '#fff', pointerEvents: 'none' }}>
+            <DashboardMap userLocation={userLocation} reports={filteredReports} />
+            <div style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(0,0,0,0.8)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(0,240,255,0.3)', backdropFilter: 'blur(10px)', color: '#fff', pointerEvents: 'none', zIndex: 1000 }}>
               <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '10px', height: '10px', background: 'var(--accent-cyan)', borderRadius: '50%', boxShadow: '0 0 8px var(--accent-cyan)' }}></div>
                 Active Reports Region

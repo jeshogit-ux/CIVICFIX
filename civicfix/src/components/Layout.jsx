@@ -1,6 +1,8 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Shield, Home, AlertTriangle, ShieldAlert, BarChart3, Info, Hexagon } from 'lucide-react';
+import { Shield, Home, AlertTriangle, ShieldAlert, BarChart3, Info, Hexagon, Trophy } from 'lucide-react';
+import Chatbot from './Chatbot';
+import CustomCursor from './CustomCursor';
 
 const Layout = () => {
   const location = useLocation();
@@ -10,6 +12,7 @@ const Layout = () => {
     { path: '/report', icon: <AlertTriangle size={20} />, label: 'Report Issue' },
     { path: '/dashboard', icon: <BarChart3 size={20} />, label: 'Dashboard' },
     { path: '/security', icon: <ShieldAlert size={20} />, label: 'Security Hub' },
+    { path: '/leaderboard', icon: <Trophy size={20} />, label: 'Leaderboard' },
     { path: '/about', icon: <Info size={20} />, label: 'About' },
   ];
 
@@ -43,6 +46,8 @@ const Layout = () => {
       <main className="main-content">
         <Outlet />
       </main>
+      <Chatbot />
+      <CustomCursor />
     </div>
   );
 };

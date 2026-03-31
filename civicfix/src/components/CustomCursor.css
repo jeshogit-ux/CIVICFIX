@@ -1,0 +1,102 @@
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+.custom-cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000; /* Above everything */
+  transform: translate(-50%, -50%);
+  /* Immediate 1:1 tracking for the dot */
+}
+
+.cursor-dot {
+  width: 100%;
+  height: 100%;
+  background-color: #4a8bfc;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #4a8bfc;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cursor-trailer {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  /* Trailing physics delay! */
+  transition: left 0.15s cubic-bezier(0.25, 1, 0.5, 1), top 0.15s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+}
+
+.trailer-ring {
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(0, 71, 255, 0.5); /* deep blue trailing */
+  border-radius: 50%;
+  animation: slowOrbit 6s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes slowOrbit {
+  0% { transform: rotate(0deg) scale(1); border-radius: 50%; }
+  50% { transform: rotate(180deg) scale(1.05); border-radius: 40%; }
+  100% { transform: rotate(360deg) scale(1); border-radius: 50%; }
+}
+
+@keyframes shapeShiftOrbit {
+  0% { 
+    transform: rotate(0deg) scale(1); 
+    border-color: var(--accent-cyan); 
+    border-radius: 30%; /* Shape shifts into a soft square! */
+  }
+  50% { 
+    transform: rotate(180deg) scale(0.9); 
+    border-color: var(--accent-blue); 
+    border-radius: 50%; 
+  }
+  100% { 
+    transform: rotate(360deg) scale(1); 
+    border-color: var(--accent-cyan); 
+    border-radius: 30%; 
+  }
+}
+
+/* Hover State - Links and Buttons */
+.cursor-hover .cursor-dot {
+  background-color: #ffffff;
+  transform: scale(0.4);
+  box-shadow: 0 0 20px #ffffff;
+}
+
+.trailer-hover {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+.trailer-hover .trailer-ring {
+  border: 2px dashed var(--accent-cyan);
+  animation: shapeShiftOrbit 3s linear infinite;
+  background: rgba(0, 240, 255, 0.05);
+}
+
+/* Click State */
+.cursor-clicked .cursor-dot {
+  transform: scale(0.7);
+}
+.trailer-clicked {
+  transform: translate(-50%, -50%) scale(0.8);
+}
+.trailer-clicked .trailer-ring {
+  border-color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cursor-hidden {
+  opacity: 0;
+}

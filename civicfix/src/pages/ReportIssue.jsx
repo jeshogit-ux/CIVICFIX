@@ -1,12 +1,147 @@
-import React, { useState } from 'react';
-import { Camera, MapPin, UploadCloud, AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Camera, MapPin, UploadCloud, AlertCircle, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
+import L from 'leaflet';
 import './ReportIssue.css';
+
+// Fix leaflet default icon
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const ReportMap = ({ formData, setFormData }) => {
+  const mapContainerRef = React.useRef(null);
+  const mapInstanceRef = React.useRef(null);
+  const markerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (mapInstanceRef.current === null && mapContainerRef.current) {
+      // Initialize map
+      const map = L.map(mapContainerRef.current).setView([formData.lat, formData.lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Add draggable marker
+      const marker = L.marker([formData.lat, formData.lng], { draggable: true }).addTo(map);
+      markerRef.current = marker;
+
+      // Ensure marker updates coordinate state on drag
+      marker.on('dragend', () => {
+        const pos = marker.getLatLng();
+        updateLocationData(pos.lat, pos.lng);
+      });
+
+      // Handle map clicks
+      map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        updateLocationData(lat, lng);
+      });
+
+      mapInstanceRef.current = map;
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  const updateLocationData = (lat, lng) => {
+    setFormData(prev => ({ ...prev, lat, lng }));
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.display_name) {
+          setFormData(prev => ({ ...prev, location: data.display_name, lat, lng }));
+        }
+      })
+      .catch(console.error);
+  };
+
+  // Sync external changes (like Geolocation load) with map
+  React.useEffect(() => {
+    if (mapInstanceRef.current && markerRef.current) {
+      const newPos = [formData.lat, formData.lng];
+      markerRef.current.setLatLng(newPos);
+      mapInstanceRef.current.flyTo(newPos, mapInstanceRef.current.getZoom(), { animate: true });
+    }
+  }, [formData.lat, formData.lng]);
+
+  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%)', zIndex: 0 }} />;
+};
 
 const ReportIssue = () => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ category: '', description: '', location: '' });
+  const [formData, setFormData] = useState({ 
+    category: '', 
+    description: '', 
+    location: '',
+    username: '',
+    lat: 12.8236, // default
+    lng: 80.0435
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trackingId, setTrackingId] = useState('');
+  const [locationLoaded, setLocationLoaded] = useState(false);
+  const [isCategorizing, setIsCategorizing] = useState(false);
+
+  const handleAutoCategorize = async () => {
+    if (!formData.description) return alert("Please enter a description first.");
+    setIsCategorizing(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+      const res = await fetch(`${API_URL}/api/ai/categorize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: formData.description })
+      });
+      const data = await res.json();
+      if (res.ok && data.category) {
+        const validCategories = ["infrastructure", "sanitation", "traffic", "utilities"];
+        if (validCategories.includes(data.category)) {
+          setFormData(prev => ({ ...prev, category: data.category }));
+        } else {
+          alert(`AI suggested "${data.category}" which doesn't match standard categories.`);
+        }
+      } else {
+        alert("AI couldn't categorize. " + (data.error || ""));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to connect to AI service.");
+    } finally {
+      setIsCategorizing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (step === 2 && !locationLoaded && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setFormData(prev => ({ ...prev, lat: latitude, lng: longitude }));
+        setLocationLoaded(true);
+        // Reverse geocode
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.display_name && !formData.location) {
+              setFormData(prev => ({ ...prev, location: data.display_name }));
+            }
+          })
+          .catch(console.error);
+      }, (err) => {
+        console.warn('Geolocation error:', err);
+      });
+    }
+  }, [step, locationLoaded, formData.location]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -22,6 +157,12 @@ const ReportIssue = () => {
   const nextStep = () => setStep(s => Math.min(s + 1, 4));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
+  const isNextDisabled = () => {
+    if (step === 1) return !formData.category || !formData.description.trim();
+    if (step === 2) return !formData.location || !formData.location.trim();
+    return false;
+  };
+
   const submitReport = async () => {
     setIsSubmitting(true);
     try {
@@ -33,8 +174,9 @@ const ReportIssue = () => {
           title: formData.category ? formData.category.toUpperCase() : 'General Issue',
           description: formData.description + (formData.location ? ` (Location: ${formData.location})` : ''),
           category: formData.category || 'General',
-          location: { lat: 12.8236, lng: 80.0435 },
-          imageUrl: formData.imageBase64 || null
+          location: { lat: formData.lat, lng: formData.lng },
+          imageUrl: formData.imageBase64 || null,
+          username: formData.username
         })
       });
       
@@ -91,13 +233,36 @@ const ReportIssue = () => {
               </select>
             </div>
             <div className="form-group">
-              <label>Description</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
+                <label style={{ margin: 0 }}>Description</label>
+                <button 
+                  type="button" 
+                  className="btn-secondary" 
+                  style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}
+                  onClick={handleAutoCategorize}
+                  disabled={isCategorizing || !formData.description}
+                >
+                  {isCategorizing ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}
+                  Auto-Categorize
+                </button>
+              </div>
               <textarea 
                 className="input-field" 
                 rows="4" 
-                placeholder="Briefly describe the issue..."
+                placeholder="Briefly describe the issue... then click Auto-Categorize!"
                 value={formData.description}
                 onChange={e => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group" style={{ marginTop: '20px' }}>
+              <label>Citizen Handle (Required for Leaderboard XP)</label>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="e.g. CitySaver99"
+                value={formData.username}
+                onChange={e => setFormData({...formData, username: e.target.value})}
               />
             </div>
           </div>
@@ -106,20 +271,11 @@ const ReportIssue = () => {
         {step === 2 && (
           <div className="form-step">
             <h3>Pin Location</h3>
-            <div className="mock-map-container" style={{ padding: 0, border: 'none', background: 'transparent' }}>
-              <iframe
-                title="Pin Location"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=80.035,12.815,80.050,12.835&layer=mapnik&marker=12.8236,80.0435"
-                style={{ filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%)', border: '1px solid var(--glass-border)', borderRadius: '12px', display: 'block' }}
-              ></iframe>
-              <div className="map-overlay" style={{ pointerEvents: 'none', background: 'rgba(0,0,0,0.3)' }}>
-                <MapPin size={48} color="var(--accent-warning)" className="pin-animation" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' }} />
-                <p style={{background: 'rgba(0,0,0,0.7)', padding: '8px 16px', borderRadius: '20px', fontWeight: 500}}>Drag map to pin precise issue location</p>
+            <div className="map-wrapper" style={{ height: '300px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)', zIndex: 0, position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.7)', padding: '8px 16px', borderRadius: '20px', zIndex: 1000, color: 'white', fontWeight: 500, backdropFilter: 'blur(5px)', pointerEvents: 'none' }}>
+                Click or drag pin to set precise location
               </div>
+              <ReportMap formData={formData} setFormData={setFormData} />
             </div>
             <div className="form-group" style={{marginTop: '20px'}}>
               <label>Confirm Address or Intersection</label>
@@ -179,7 +335,7 @@ const ReportIssue = () => {
 
         <div className="form-actions">
           {step > 1 && step < 4 && <button className="btn-secondary" onClick={prevStep} disabled={isSubmitting}>Back</button>}
-          {step < 3 && <button className="btn-primary" onClick={nextStep} disabled={isSubmitting}>Next Step</button>}
+          {step < 3 && <button className="btn-primary" onClick={nextStep} disabled={isSubmitting || isNextDisabled()}>Next Step</button>}
           {step === 3 && (
             <button 
               className="btn-primary" 

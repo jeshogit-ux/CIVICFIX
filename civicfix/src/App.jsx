@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import ReportIssue from './pages/ReportIssue';
 import SecurityHub from './pages/SecurityHub';
 import About from './pages/About';
+import Leaderboard from './pages/Leaderboard';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="report" element={<ReportIssue />} />
           <Route path="security" element={<SecurityHub />} />
+          <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="about" element={<About />} />
         </Route>
       </Routes>
