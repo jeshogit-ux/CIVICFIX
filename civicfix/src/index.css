@@ -258,74 +258,198 @@ h1, h2, h3, h4, h5, h6 {
   padding: 40px 0;
 }
 
-/* Mobile Responsiveness */
+/* ============================================
+   TABLET (768px)
+   ============================================ */
 @media (max-width: 768px) {
   .nav-content {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
-  
+
   .nav-links {
     width: 100%;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
   }
-  
+
+  .nav-links::-webkit-scrollbar { display: none; }
+
   .nav-link {
     flex-direction: column;
-    font-size: 0.8rem;
-    padding: 8px;
+    font-size: 0.75rem;
+    padding: 8px 10px;
     text-align: center;
+    gap: 4px;
   }
 
   .main-content {
     padding: 20px 0;
   }
-  
+
   h1 { font-size: 2rem; }
   h2 { font-size: 1.5rem; }
+
+  .container {
+    padding: 0 16px;
+  }
 }
 
+/* ============================================
+   ANDROID MOBILE (max 480px) - BOTTOM NAV BAR
+   ============================================ */
 @media (max-width: 480px) {
+  /* Smooth scrolling on Android */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    /* Prevent text size inflation on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* ---- Bottom Navigation Bar ---- */
   .main-nav {
     position: fixed;
     bottom: 0;
     top: auto;
+    left: 0;
+    right: 0;
     width: 100%;
-    padding: 10px 0;
+    padding: 8px 0;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
     border-radius: 24px 24px 0 0;
     border-top: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     z-index: 1000;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 240, 255, 0.04);
   }
 
   .nav-content {
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 4px;
   }
 
+  /* Hide brand logo in bottom nav — show app title at top of page content */
   .brand {
-    display: none !important; /* Hide brand on very small screens to fit icons */
+    display: none !important;
   }
 
   .nav-links {
     justify-content: space-around;
+    align-items: center;
     width: 100%;
     overflow: visible;
+    gap: 0;
+    padding: 0;
+  }
+
+  /* Bottom nav items - icon + micro-label */
+  .nav-link {
+    flex-direction: column;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 8px 6px;
+    border-radius: 16px;
+    gap: 4px;
+    min-width: 52px;
+    /* Large touch target for Android */
+    min-height: 48px;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   .nav-link span {
-    display: none; /* Icon only mode for bottom bar */
+    display: block; /* Show label under icon */
+    font-size: 0.6rem;
+    white-space: nowrap;
   }
 
-  .nav-link {
-    padding: 12px;
-    border-radius: 50%;
+  /* Active indicator glow */
+  .nav-link.active {
+    background: rgba(0, 240, 255, 0.12);
+    color: var(--accent-cyan);
+    border-radius: 16px;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
   }
 
+  /* Remove underline effect - replace with pill highlight for bottom nav */
+  .nav-link::after {
+    display: none;
+  }
+
+  /* ---- Main content area ---- */
   .main-content {
-    padding-bottom: 90px; /* Space for bottom nav */
+    padding: 16px 0;
+    /* Space for bottom nav + safe area */
+    padding-bottom: calc(82px + env(safe-area-inset-bottom));
+  }
+
+  /* ---- Global font scaling ---- */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.1rem; }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  /* ---- Buttons - larger touch targets ---- */
+  .btn-primary,
+  .btn-secondary {
+    padding: 14px 24px;
+    font-size: 0.95rem;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* ---- Input fields ---- */
+  .input-field {
+    padding: 14px 16px;
+    font-size: 1rem; /* Prevent zoom on iOS/Android */
+  }
+
+  /* ---- Glass cards - reduce heavy blurs for performance ---- */
+  .glass-panel {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Disable hover transforms on touch */
+  .glass-panel:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   VERY SMALL PHONES (max 360px)
+   ============================================ */
+@media (max-width: 360px) {
+  .nav-link {
+    font-size: 0.55rem;
+    padding: 6px 4px;
+    min-width: 44px;
+  }
+
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.2rem; }
+
+  .container {
+    padding: 0 12px;
   }
 }

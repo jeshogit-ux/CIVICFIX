@@ -235,3 +235,83 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ---- Mobile (480px) ---- */
+@media (max-width: 480px) {
+  .about-page {
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+
+  .about-header-minimal {
+    padding-top: 20px;
+    gap: 12px;
+  }
+
+  .about-header-minimal h1 {
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .about-header-minimal p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .team-showcase {
+    gap: 24px;
+  }
+
+  .member-row,
+  .member-row.reversed {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    padding: 24px 16px;
+    border-radius: 16px;
+  }
+
+  .hologram-ring {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+
+  .member-content h2 {
+    font-size: 1.6rem;
+  }
+
+  .detailed-bio {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .skills-row {
+    justify-content: center;
+  }
+
+  .skill-chip {
+    font-size: 0.78rem;
+    padding: 5px 12px;
+  }
+
+  .minimal-social {
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .manifesto-section {
+    padding: 32px 0 16px 0;
+  }
+
+  .manifesto-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .manifesto-section p {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}

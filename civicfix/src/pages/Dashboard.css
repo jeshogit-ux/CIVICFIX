@@ -239,3 +239,130 @@
   70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255,255,255, 0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255, 0); }
 }
+
+/* ---- Tablet ---- */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .filters {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .filter-tags {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .map-placeholder {
+    height: 400px;
+  }
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 480px) {
+  .dashboard-page {
+    gap: 20px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .view-toggle {
+    width: 100%;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .filters {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .filter-tags {
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .filter-tag {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
+
+  .report-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 12px;
+    transition: none;
+  }
+
+  .report-card:hover {
+    transform: none;
+  }
+
+  .report-header-line {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .report-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .report-details h3 {
+    font-size: 1rem;
+  }
+
+  .report-details p {
+    font-size: 0.85rem;
+  }
+
+  .tracking-id {
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  .map-placeholder {
+    height: 300px;
+    border-radius: 12px;
+  }
+}

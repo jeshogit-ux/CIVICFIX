@@ -178,3 +178,70 @@
     width: 40px;
   }
 }
+
+/* ---- Mobile ---- */
+@media (max-width: 480px) {
+  .leaderboard-page {
+    /* Reduce top padding since nav is at bottom */
+    padding-top: 20px;
+    max-width: 100%;
+  }
+
+  .header-icon-glow {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 16px;
+  }
+
+  .leaderboard-header {
+    margin-bottom: 24px;
+  }
+
+  .leaderboard-container {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .leaderboard-list {
+    gap: 10px;
+  }
+
+  .leaderboard-row {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .rank-container {
+    width: 32px;
+    font-size: 16px;
+  }
+
+  .avatar-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+    margin-right: 10px;
+  }
+
+  .citizen-name {
+    font-size: 14px;
+  }
+
+  .citizen-title {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .xp-container {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .xp-amount {
+    font-size: 14px;
+  }
+
+  .xp-label {
+    font-size: 10px;
+  }
+}

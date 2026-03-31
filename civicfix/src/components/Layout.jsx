@@ -3,21 +3,23 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Shield, Home, AlertTriangle, ShieldAlert, BarChart3, Info, Hexagon, Trophy } from 'lucide-react';
 import Chatbot from './Chatbot';
 import CustomCursor from './CustomCursor';
+import './Layout.css';
 
 const Layout = () => {
   const location = useLocation();
 
   const navItems = [
     { path: '/', icon: <Home size={20} />, label: 'Home' },
-    { path: '/report', icon: <AlertTriangle size={20} />, label: 'Report Issue' },
+    { path: '/report', icon: <AlertTriangle size={20} />, label: 'Report' },
     { path: '/dashboard', icon: <BarChart3 size={20} />, label: 'Dashboard' },
-    { path: '/security', icon: <ShieldAlert size={20} />, label: 'Security Hub' },
-    { path: '/leaderboard', icon: <Trophy size={20} />, label: 'Leaderboard' },
+    { path: '/security', icon: <ShieldAlert size={20} />, label: 'Security' },
+    { path: '/leaderboard', icon: <Trophy size={20} />, label: 'Ranks' },
     { path: '/about', icon: <Info size={20} />, label: 'About' },
   ];
 
   return (
     <div className="layout">
+      {/* Desktop / Tablet top nav */}
       <nav className="glass-panel main-nav">
         <div className="container nav-content">
           <Link to="/" className="brand" style={{ gap: '10px' }}>
@@ -43,6 +45,23 @@ const Layout = () => {
           </div>
         </div>
       </nav>
+
+      {/* Mobile-only top app bar */}
+      <header className="mobile-top-bar">
+        <Link to="/" className="mobile-brand">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Hexagon size={22} color="var(--accent-cyan)" strokeWidth={1.5} />
+            <div style={{ position: 'absolute', width: '6px', height: '6px', backgroundColor: 'var(--accent-purple)', borderRadius: '50%' }}></div>
+          </div>
+          <span className="mobile-brand-text">
+            Civic<span style={{ color: 'var(--accent-cyan)', fontWeight: 300 }}>Fix</span>
+          </span>
+        </Link>
+        <div className="mobile-page-indicator">
+          {navItems.find(i => i.path === location.pathname)?.label ?? 'Home'}
+        </div>
+      </header>
+
       <main className="main-content">
         <Outlet />
       </main>
@@ -53,3 +72,4 @@ const Layout = () => {
 };
 
 export default Layout;
+
