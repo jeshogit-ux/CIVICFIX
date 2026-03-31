@@ -102,6 +102,27 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
+// Update Issue Status
+app.patch('/api/issues/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['Pending', 'In Progress', 'Assigned', 'Resolved'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+    const updated = await Issue.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Issue not found' });
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error('Error updating issue status:', err);
+    res.status(500).json({ error: 'Failed to update status' });
+  }
+});
+
 // AI Routes
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
