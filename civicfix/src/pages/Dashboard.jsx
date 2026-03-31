@@ -75,7 +75,6 @@ const Dashboard = () => {
   const [view, setView] = useState('list');
   const [filter, setFilter] = useState('All');
   const [reports, setReports] = useState([]);
-  const [resolvingId, setResolvingId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState([12.8236, 80.0435]);
 
@@ -112,7 +111,6 @@ const Dashboard = () => {
              const lng = issue.location?.lng || (80.0435 + (Math.random() * 0.02 - 0.01));
 
              return {
-               _id: issue._id,
                id: 'CFX-' + (issue._id ? issue._id.substring(issue._id.length - 6).toUpperCase() : '0000'),
                type: issue.category ? issue.category.charAt(0).toUpperCase() + issue.category.slice(1) : 'General',
                location: locPreview,
@@ -133,28 +131,6 @@ const Dashboard = () => {
     };
     fetchReports();
   }, []);
-
-  const handleResolve = async (report) => {
-    if (report.status === 'Resolved') return;
-    setResolvingId(report._id);
-    try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-      const res = await fetch(`${API_URL}/api/issues/${report._id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Resolved' })
-      });
-      if (res.ok) {
-        setReports(prev => prev.map(r =>
-          r._id === report._id ? { ...r, status: 'Resolved', icon: <CheckCircle size={20} color="var(--accent-green)" /> } : r
-        ));
-      }
-    } catch (err) {
-      console.error('Failed to resolve issue', err);
-    } finally {
-      setResolvingId(null);
-    }
-  };
 
   const filteredReports = reports.filter(report => {
     if (filter === 'All') return true;
@@ -218,19 +194,7 @@ const Dashboard = () => {
                   <p>{report.location} &bull; Reported {report.date}</p>
                 </div>
                 <div className="report-action">
-                  {report.status !== 'Resolved' ? (
-                    <button
-                      className="resolve-btn"
-                      onClick={() => handleResolve(report)}
-                      disabled={resolvingId === report._id}
-                      title="Mark as Resolved"
-                    >
-                      {resolvingId === report._id ? '...' : <CheckCircle size={18} />}
-                      {resolvingId === report._id ? 'Saving' : 'Resolve'}
-                    </button>
-                  ) : (
-                    <span className="resolved-badge"><CheckCircle size={16} /> Done</span>
-                  )}
+                  <ChevronRight size={24} color="var(--text-secondary)" />
                 </div>
               </div>
             ))}
