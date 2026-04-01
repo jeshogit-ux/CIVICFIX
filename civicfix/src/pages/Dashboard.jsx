@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Map as MapIcon, List, Clock, CheckCircle, AlertTriangle, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import L from 'leaflet';
 import './Dashboard.css';
 
@@ -54,13 +55,13 @@ const DashboardMap = ({ userLocation, reports }) => {
       reports.forEach(report => {
         const marker = L.marker([report.lat, report.lng]).addTo(mapInstanceRef.current);
         const popupContent = `
-          <div style="color: #000; font-family: var(--font-main)">
-            <strong style="font-size: 1.1rem; color: #333">${report.type} Issue</strong>
+          <div style="color: var(--text-primary); font-family: var(--font-main)">
+            <strong style="font-size: 1.1rem;">${report.type} Issue</strong>
             <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px">
-              <span style="background: ${report.status === 'Resolved' ? '#e0fce5' : '#e0f2fe'}; color: ${report.status === 'Resolved' ? '#00e676' : '#0047ff'}; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600">${report.status}</span>
+              <span style="background: ${report.status === 'Resolved' ? '#e0fce5' : '#e0f2fe'}; color: ${report.status === 'Resolved' ? '#10b981' : '#3b82f6'}; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700">${report.status}</span>
             </div>
-            <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #555">${report.location}</p>
-            <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #888">ID: ${report.id} &bull; ${report.date}</p>
+            <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: var(--text-secondary)">${report.location}</p>
+            <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted)">ID: ${report.id} &bull; ${report.date}</p>
           </div>
         `;
         marker.bindPopup(popupContent);
@@ -68,7 +69,23 @@ const DashboardMap = ({ userLocation, reports }) => {
     }
   }, [reports]);
 
-  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', filter: 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%)', zIndex: 0 }} />;
+  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: '16px', zIndex: 0 }} />;
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, y: 0, 
+    transition: { type: 'spring', damping: 20, stiffness: 100 } 
+  }
 };
 
 const Dashboard = () => {
@@ -139,11 +156,16 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="container dashboard-page animate-fade-in">
-      <div className="dashboard-header animate-slide-up animate-delay-1">
+    <motion.div 
+      className="container dashboard-page"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div className="dashboard-header" variants={itemVariants}>
         <div>
           <h2 className="text-gradient">City Progress Dashboard</h2>
-          <p style={{color: 'var(--text-secondary)', marginTop: '8px'}}>Track the status of civic issues reported in your area.</p>
+          <p style={{color: 'var(--text-secondary)', marginTop: '8px', fontSize: '1.1rem'}}>Track the status of civic issues reported in your area.</p>
         </div>
         <div className="view-toggle">
           <button className={`toggle-btn ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')}>
@@ -153,13 +175,13 @@ const Dashboard = () => {
             <MapIcon size={20} /> Map View
           </button>
         </div>
-      </div>
+      </motion.div>
 
       <div className="dashboard-content">
-        <div className="filters glass-panel animate-slide-up animate-delay-2">
+        <motion.div className="filters glass-panel" variants={itemVariants}>
           <div className="search-bar">
-            <Search size={20} color="var(--text-secondary)" />
-            <input type="text" placeholder="Search by Tracking ID or Location..." className="search-input" />
+            <Search size={20} color="var(--text-muted)" />
+            <input type="text" placeholder="Search Tracking ID or Location" className="search-input" />
           </div>
           <div className="filter-tags">
             <span className={`filter-tag ${filter === 'All' ? 'active' : ''}`} onClick={() => setFilter('All')}>All</span>
@@ -167,23 +189,23 @@ const Dashboard = () => {
             <span className={`filter-tag ${filter === 'Assigned' ? 'active' : ''}`} onClick={() => setFilter('Assigned')}>Assigned</span>
             <span className={`filter-tag ${filter === 'Resolved' ? 'active' : ''}`} onClick={() => setFilter('Resolved')}>Resolved</span>
           </div>
-        </div>
+        </motion.div>
 
         {view === 'list' ? (
-          <div className="reports-list">
+          <motion.div className="reports-list" variants={containerVariants}>
             {isLoading ? (
-              <div className="glass-panel" style={{textAlign: 'center', padding: '40px'}}>
-                <Clock size={48} color="var(--accent-cyan)" style={{animation: 'spin 2s linear infinite'}} />
-                <h3>Loading live reports...</h3>
-                <p>Fetching data from CivicFix Backend.</p>
+              <div className="glass-panel" style={{textAlign: 'center', padding: '60px 40px'}}>
+                <Clock size={48} color="var(--accent-cyan)" style={{animation: 'spin 2s linear infinite', margin: '0 auto 20px'}} />
+                <h3 style={{color: 'var(--text-primary)'}}>Loading live reports...</h3>
+                <p style={{color: 'var(--text-secondary)'}}>Fetching data from CivicFix Backend.</p>
               </div>
             ) : filteredReports.length === 0 ? (
-              <div className="glass-panel" style={{textAlign: 'center', padding: '40px'}}>
-                <h3>No reports found</h3>
-                <p>There are currently no civic issues reported.</p>
+              <div className="glass-panel" style={{textAlign: 'center', padding: '60px 40px'}}>
+                <h3 style={{color: 'var(--text-primary)'}}>No reports found</h3>
+                <p style={{color: 'var(--text-secondary)'}}>There are currently no civic issues reported.</p>
               </div>
             ) : filteredReports.map(report => (
-              <div key={report.id} className="glass-panel report-card">
+              <motion.div key={report.id} variants={itemVariants} className="glass-panel report-card">
                 <div className="report-icon">{report.icon}</div>
                 <div className="report-details">
                   <div className="report-header-line">
@@ -194,25 +216,25 @@ const Dashboard = () => {
                   <p>{report.location} &bull; Reported {report.date}</p>
                 </div>
                 <div className="report-action">
-                  <ChevronRight size={24} color="var(--text-secondary)" />
+                  <ChevronRight size={24} color="var(--text-muted)" />
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
-          <div className="glass-panel" style={{ height: '600px', width: '100%', position: 'relative', overflow: 'hidden', padding: 0 }}>
+          <motion.div variants={itemVariants} className="glass-panel" style={{ height: '600px', width: '100%', position: 'relative', overflow: 'hidden', padding: 0 }}>
             <DashboardMap userLocation={userLocation} reports={filteredReports} />
-            <div style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'rgba(0,0,0,0.8)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(0,240,255,0.3)', backdropFilter: 'blur(10px)', color: '#fff', pointerEvents: 'none', zIndex: 1000 }}>
-              <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '10px', height: '10px', background: 'var(--accent-cyan)', borderRadius: '50%', boxShadow: '0 0 8px var(--accent-cyan)' }}></div>
+            <div style={{ position: 'absolute', bottom: '20px', left: '20px', background: 'var(--bg-secondary)', padding: '16px', borderRadius: '12px', border: '1px solid var(--glass-border)', boxShadow: '0 4px 20px rgba(15, 23, 42, 0.08)', zIndex: 1000 }}>
+              <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+                <div style={{ width: '10px', height: '10px', background: 'var(--accent-cyan)', borderRadius: '50%', boxShadow: '0 0 8px var(--accent-cyan-dim)' }}></div>
                 Active Reports Region
               </h4>
               <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Showing live civic issues in the mapped bounds.</p>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

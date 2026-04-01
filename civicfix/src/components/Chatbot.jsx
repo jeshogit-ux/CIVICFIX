@@ -82,7 +82,7 @@ const Chatbot = () => {
           <div className="chatbot-messages">
             {messages.map((msg, idx) => (
               <div key={idx} className={`chat-message ${msg.role}`}>
-                {msg.role === 'ai' && <div className="avatar"><Sparkles size={14} color="#000" /></div>}
+                {msg.role === 'ai' && <div className="avatar"><Sparkles size={14} color="#FFF" /></div>}
                 <div className="message-bubble">
                   {/* Parse basic bolding out of simple gemini text response if it sends **text** */}
                   {msg.text.split('**').map((part, i) => i % 2 === 1 ? <strong key={i}>{part}</strong> : part)}
@@ -91,9 +91,9 @@ const Chatbot = () => {
             ))}
             {isTyping && (
               <div className="chat-message ai typing">
-                <div className="avatar"><Sparkles size={14} color="#000" /></div>
+                <div className="avatar"><Sparkles size={14} color="#FFF" /></div>
                 <div className="message-bubble typing-indicator">
-                  <Loader2 size={16} className="spin" color="var(--accent-cyan)" />
+                  <Loader2 size={16} className="spin" color="var(--accent-purple)" />
                   Thinking...
                 </div>
               </div>

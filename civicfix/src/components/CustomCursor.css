@@ -26,13 +26,13 @@
 
 .cursor-trailer {
   position: fixed;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  /* Trailing physics delay! */
-  transition: left 0.15s cubic-bezier(0.25, 1, 0.5, 1), top 0.15s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+  /* Snappy fast trailing physics delay! */
+  transition: left 0.05s cubic-bezier(0.25, 1, 0.5, 1), top 0.05s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
 }
 
 .trailer-ring {
@@ -99,4 +99,11 @@
 
 .cursor-hidden {
   opacity: 0;
+}
+
+/* Hide entirely on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .custom-cursor, .cursor-trailer {
+    display: none !important;
+  }
 }

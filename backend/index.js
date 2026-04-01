@@ -155,7 +155,28 @@ app.post('/api/ai/categorize', async (req, res) => {
     const { description } = req.body;
     if (!description) { return res.status(400).json({ error: 'Description is required' }); }
 
-    const promptText = `Analyze this civic issue description and categorize it tightly into exactly one of these nine categories: "infrastructure", "sanitation", "traffic", "utilities", "environment", "safety", "animals", "health", or "landscaping". Description: "${description}". Only return the exact category word in lowercase with no punctuation.`;
+    const promptText = `You are a Tamil Nadu Government issue routing assistant.
+Analyze the following civic issue description and assign it to EXACTLY ONE of the official Tamil Nadu Government departments listed below.
+
+OFFICIAL TN GOVERNMENT DEPARTMENTS:
+1. Highways Department (roads, potholes, flyovers, bridges, national/state highways)
+2. Tamil Nadu Water Supply and Drainage Board - TWAD (water supply, pipeline leaks, drinking water shortage)
+3. Greater Chennai Corporation / Local Body (garbage, street cleaning, stray animals, local drains, footpaths, street lights in city limits)
+4. Tamil Nadu Electricity Board - TANGEDCO (power outages, electric pole damage, transformer issues, illegal connections)
+5. Public Works Department - PWD (government buildings, canals, minor irrigation, flood control)
+6. Tamil Nadu Police Department (law and order, crime, traffic violations, road accidents)
+7. Department of Health and Family Welfare (public health hazards, hospital issues, disease outbreak)
+8. Tamil Nadu Forest Department (tree felling, deforestation, forest encroachment, wildlife)
+9. Revenue and Disaster Management Department (land encroachment, natural disaster relief, flood damage)
+10. Tamil Nadu Housing Board (government housing, slum development, layout issues)
+11. Chennai Metropolitan Water Supply and Sewerage Board - Metro Water (sewage overflow, manhole issues, drainage in Chennai)
+12. Tamil Nadu Pollution Control Board (industrial pollution, air/water/noise pollution, illegal dumping of chemicals)
+13. Tamil Nadu Transport Department (bus route issues, auto/taxi overcharging, road transport)
+14. Department of Municipal Administration and Water Supply (issues in municipal towns outside Chennai)
+
+Issue Description: "${description}"
+
+Reply with ONLY the exact department name from the list above. No explanation, no punctuation at the end, no extra words.`;
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await fetch(endpoint, {
@@ -170,7 +191,7 @@ app.post('/api/ai/categorize', async (req, res) => {
         return res.status(500).json({ error: data.error?.message || response.statusText });
     }
 
-    const categoryText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()?.toLowerCase() || "";
+    const categoryText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Greater Chennai Corporation / Local Body";
     res.status(200).json({ category: categoryText });
   } catch (err) {
     console.error('AI Categorize Error:', err);
